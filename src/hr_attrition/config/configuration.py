@@ -1,6 +1,6 @@
 from hr_attrition.constants import *
 from hr_attrition.utils.common import read_yaml, create_directories
-from hr_attrition.entity.config_entity import DataIngestionConfig, DataValidationConfig, DataTransformationConfig , ModelTrainingConfig
+from hr_attrition.entity.config_entity import DataIngestionConfig, DataValidationConfig, DataTransformationConfig , ModelTrainingConfig , ModelEvaluationConfig
 
 
 class ConfigurationManager:
@@ -88,5 +88,31 @@ class ConfigurationManager:
     )
 
      return model_trainer_config
+    
+
+   
+
+
+
+    def get_model_evaluation_config(self) -> ModelEvaluationConfig:
+        config = self.config.model_evaluation
+        params = self.params.model_params
+        schema = self.schema.TARGET_COLUMN
+
+        # Ensure the root directory for model evaluation exists
+        create_directories([config.root_dir])
+
+        # Create and return the ModelEvaluationConfig object
+        model_evaluation_config = ModelEvaluationConfig(
+            root_dir=Path(config.root_dir),
+            test_data_path=Path(config.test_data_path),
+            model_path=Path(config.model_path),
+            all_params=params,
+            metric_file_name=Path(config.metric_file_name),
+            target_column=schema.name
+        )
+        return model_evaluation_config
+        
+
 
 

@@ -3,52 +3,35 @@ from hr_attrition.pipeline.data_ingestion import DataIngestionTrainingPipeline
 from hr_attrition.pipeline.data_validation import DataValidationTrainingPipeline
 from hr_attrition.pipeline.data_transformation import DataTransformationTrainingPipeline
 from hr_attrition.pipeline.model_trainer import ModelTrainingPipeline
+from hr_attrition.pipeline.model_evaluation import ModelEvaluationPipeline  # Fixed import
 
 
-
-STAGE_NAME = "Data Ingestion stage"
-try:
-   logger.info(f">>>>>> stage {STAGE_NAME} started <<<<<<") 
-   data_ingestion = DataIngestionTrainingPipeline()
-   data_ingestion.main()
-   logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx==========x")
-except Exception as e:
+def run_pipeline(stage_name, pipeline_class):
+    """
+    Helper function to run a pipeline stage with proper logging and error handling.
+    """
+    try:
+        logger.info(f">>>>>> stage {stage_name} started <<<<<<")
+        pipeline = pipeline_class()
+        pipeline.main()
+        logger.info(f">>>>>> stage {stage_name} completed <<<<<<\n\nx==========x")
+    except Exception as e:
+        logger.error(f"Exception occurred in stage {stage_name}: {e}")
         logger.exception(e)
         raise e
 
 
+if __name__ == "__main__":
+    # Define the stages of the pipeline
+    stages = [
+        ("Data Ingestion stage", DataIngestionTrainingPipeline),
+        ("Data Validation stage", DataValidationTrainingPipeline),
+        ("Data Transformation stage", DataTransformationTrainingPipeline),
+        ("Model Training stage", ModelTrainingPipeline),
+        ("Model Evaluation stage", ModelEvaluationPipeline),  # Fixed pipeline reference
+    ]
 
-
-STAGE_NAME = "Data Validation stage"
-try:
-   logger.info(f">>>>>> stage {STAGE_NAME} started <<<<<<") 
-   data_validation = DataValidationTrainingPipeline()
-   data_validation.main()
-   logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx==========x")
-except Exception as e:
-        logger.exception(e)
-        raise e
-
-
-STAGE_NAME = "Data Transformation stage"
-try:
-   logger.info(f">>>>>> stage {STAGE_NAME} started <<<<<<") 
-   data_transformation = DataTransformationTrainingPipeline()
-   data_transformation.main()
-   logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx==========x")
-except Exception as e:
-        logger.exception(e)
-        raise e
-
-
-STAGE_NAME = "Model Training stage"
-try:
-   logger.info(f">>>>>> stage {STAGE_NAME} started <<<<<<") 
-   model_trainer = ModelTrainingPipeline()
-   model_trainer.main()
-   logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx==========x")
-except Exception as e:
-        logger.exception(e)
-        raise e
-
+    # Run each stage sequentially
+    for stage_name, pipeline_class in stages:
+        run_pipeline(stage_name, pipeline_class)
 
